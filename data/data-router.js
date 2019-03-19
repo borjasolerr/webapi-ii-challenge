@@ -56,6 +56,44 @@ router.delete('/:id', async (req, res) => {
 
 //PUT
 
+router.put('/:id', async (req, res) => {
+  const { title, contents } = req.body;
+
+  try {
+    if (title && contents) {
+      const post = await Posts.update(req.params.id, { title, contents });
+      if (post) {
+        res.status(200).json(post);
+      } else {
+        res.status(404).json({ message: 'The post with the specified ID does not exist.' });
+      }
+    } else {
+      res.status(400).json({ error: 'Please provide title and contents for the post.' });
+    }
+  } catch (error) {
+    // log error to database
+    console.log(error);
+    res.status(500).json({
+      message: 'The post information could not be modified.'
+    });
+  }
+});
+
 //POST
+
+router.post('/', async (req, res) => {
+  const { title, contents } = req.body;
+
+  try {
+    if (title && contents) {
+      const post = await Posts.insert({ title, contents });
+      res.status(201).json(post);
+    } else {
+      res.status(400).json({ error: 'Please provide title and contents for the post.' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'There was an error while saving the post to the database.' });
+  }
+});
 
 module.exports = router;
